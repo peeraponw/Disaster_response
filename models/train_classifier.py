@@ -22,7 +22,14 @@ import warnings; warnings.simplefilter('ignore')
 
 def load_data(database_filepath):
     '''
+    Function to load the cleaned data from ETL pipeline
     
+    Args:
+        database_filepath (string): database name
+    Returns:
+        X (dataframe): messages as features of the dataset
+        Y (dataframe): numbers to specify the category of the dataset
+        category_names (list of strings): column names
     '''
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql_table('disaster', con=engine)
@@ -34,7 +41,12 @@ def load_data(database_filepath):
 
 def tokenize(text):
     '''
+    Tokenize the input text by lowering and lemmatization
     
+    Args:
+        text (string): unprocessed text
+    Returns:
+        text (string): text which are lowered and lemmatized
     '''
     # initiate lemmatizer
     lemmatizer = WordNetLemmatizer()
@@ -44,23 +56,58 @@ def tokenize(text):
 
 def build_model():
     '''
+    Build model by creating a pipeline first. Then apply GridSearchCV concept
     
+    Args:
+        None
+    Returns:
+        model (estimator object): an estimator that is able to make a prediction
     '''
     pipeline = Pipeline([
             ('vect', CountVectorizer(tokenizer=tokenize)),
             ('tfidf', TfidfTransformer()),
             ('clf', MultiOutputClassifier(RandomForestClassifier())),
         ])
-    return pipeline
+    parameters = {
+    'clf__estimator__n_estimators': [2,20,50],
+    'clf__estimator__max_depth': [5,10,30],
+    'clf__estimator__min_samples_split': [5,10,20]    
+    }
+    cv = GridSearchCV(pipeline, param_grid=parameters)
+    return cv
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    Evaluate the model by comparing the prediction on test data and the test results
+    
+    Args:
+        model (estimator): estimator to make a prediction
+        X_test (dataframe): features of test data
+        Y_test (dataframe): results of test data
+        category_names (list of strings): column names
+        
+    Returns:
+        None
+    '''
     y_pred = model.predict(X_test)
     for idx in range(y_pred.shape[1]):
-        report = classification_report(Y_test.as_matrix()[:,idx], y_pred[:,idx], output_dict=True)
+        report = classification_report(Y_test.as_matrix()[:,idx], y_pred[:,idx],
+                                       output_dict=True)
         print('Category', category_names[idx])
         for key in report.keys():
-            print('Label {}:\t Precision={:.3}, Recall={:.3}, F1-score={:.3}'.format(key, report[key]['precision'], report[key]['recall'], report[key]['f1-score']))
+            print('Label {}:\t Precision={:.3}, Recall={:.3}, F1-score={:.3}'\
+                  ''.format(key, report[key]['precision'], report[key]['recall'],
+                            report[key]['f1-score']))
 
 def save_model(model, model_filepath):
+    '''
+    Save the model into pickle file
+    
+    Args:
+        model (estimator): trained model
+        model_filepath (string): path to save the model
+    Returns:
+        None
+    '''
     with open(model_filepath, 'wb') as file:
         pickle.dump(model, file)
 
