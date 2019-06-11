@@ -1,5 +1,5 @@
 # Disaster Response Pipeline Project
-
+This project is a part of Udemy's Data Science Nanodegree. The concept of this project is to classify incoming texts during disaster. The classified results can lead to better understanding and better preparation of corresponding parties during the fatal situations.
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
