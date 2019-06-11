@@ -1,12 +1,59 @@
 import sys
+import pandas as pd
+from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
-    pass
-
+    '''
+    Function to read csv files, messages and categories, and merge them into a dataframe.
+    
+    Args:
+        messages_filepath (string): path to messages file
+        categories_filepath (string): path to categories file
+        
+    Returns:
+        df (dataframe): merged message and categories dataframe using 'id' as common column
+    '''
+    # read message file
+    messages = pd.read_csv(messages_filepath)
+    # read categories file
+    categories = pd.read_csv(categories_filepath)
+    # merge dataframes
+    df = messages.set_index('id').join(categories.set_index('id'), on=['id'])
+    return df
 
 def clean_data(df):
-    pass
+    '''
+    Function to clean the dataframe as follows:
+        - split the 'categories' column into multiple columns witb their 
+            corresponding meaning
+        - rename the newly created columns
+        - convert the information from string to int
+        - drop the old 'categories' column
+        - join new columns to df
+    
+    Args:
+        df (dataframe): raw dataframe
+    Returns:
+        df (dataframe): cleaned dataframe
+    '''
+    # convert categories column into multiple categorized columns 
+    categories = df['categories'].str.split(';', expand=True)
+    # rename the newly created columns
+    row = categories.iloc[0]
+    category_colnames = row.apply(lambda x: x[:-2])
+    categories.columns = category_colnames
+    # convert category number to just 0 or 1
+    for column in categories:
+        # set each value to be the last character of the string
+        categories[column] = categories[column].str[-1]        
+        # convert column from string to numeric
+        categories[column] = categories[column].astype(int)
+    # drop the initial column
+    df = df.drop(columns=['categories'])
+    # join new columns
+    df = df.join(categories)
+    return df
 
 
 def save_data(df, database_filename):
