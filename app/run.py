@@ -85,33 +85,6 @@ def index():
             }
         }
     ]
-    # data_one = []
-    # data_one.append(
-        # Bar(
-        # x=genre_names,
-        # y=genre_counts
-        # )
-    # )
-    # layout_one = dict(title='Distribution of Message Genres',
-        # xaxis=dict(title='Genre'),
-        # yaxis=dict(title='Count')
-        # )
-        
-    # data_two = []
-    # data_two.append(
-        # Bar(
-        # x=col_names,
-        # y=category_counts
-        # )
-    # )
-    # layout_two = dict(title='Distribution of Message Categories',
-        # xaxis=dict(title='Category'),
-        # yaxis=dict(title='Count')
-        # )
-        
-    # graphs = []
-    # graphs.append(dict(data=data_one, layout=layout_one))
-    # graphs.append(dict(data=data_two, layout=layout_two))
     
     
     # encode plotly graphs in JSON
