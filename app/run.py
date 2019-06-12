@@ -43,6 +43,9 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    # extract data for another visual
+    col_names = df.drop(columns=['message', 'original', 'genre']).columns.to_list()
+    category_counts = df[col_names].sum(axis=0).values
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -53,7 +56,6 @@ def index():
                     y=genre_counts
                 )
             ],
-
             'layout': {
                 'title': 'Distribution of Message Genres',
                 'yaxis': {
@@ -63,8 +65,54 @@ def index():
                     'title': "Genre"
                 }
             }
+        },
+        {
+                
+            'data': [
+                Bar(
+                    x=col_names,
+                    y=category_counts
+                )
+            ],
+            'layout': {
+                'title': 'Distribution of Message Categories',
+                'yaxis':{
+                    'title': 'Count'
+                },
+                'xaxis':{
+                    'title': 'Category'
+                }
+            }
         }
     ]
+    # data_one = []
+    # data_one.append(
+        # Bar(
+        # x=genre_names,
+        # y=genre_counts
+        # )
+    # )
+    # layout_one = dict(title='Distribution of Message Genres',
+        # xaxis=dict(title='Genre'),
+        # yaxis=dict(title='Count')
+        # )
+        
+    # data_two = []
+    # data_two.append(
+        # Bar(
+        # x=col_names,
+        # y=category_counts
+        # )
+    # )
+    # layout_two = dict(title='Distribution of Message Categories',
+        # xaxis=dict(title='Category'),
+        # yaxis=dict(title='Count')
+        # )
+        
+    # graphs = []
+    # graphs.append(dict(data=data_one, layout=layout_one))
+    # graphs.append(dict(data=data_two, layout=layout_two))
+    
     
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
@@ -93,7 +141,7 @@ def go():
 
 
 def main():
-    app.run(host='0.0.0.0', port=3001, debug=True)
+    app.run(host='0.0.0.0', port=3001, debug=False)
 
 
 if __name__ == '__main__':
